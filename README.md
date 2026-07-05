@@ -8,7 +8,7 @@ Built as a portfolio project to demonstrate workflow automation, AI integration,
 
 ## How it works
 
-1. A new email lands in Gmail
+1. A new email lands in Gmail 
 2. Sender name, email, subject, body, and timestamp are extracted and a unique ticket ID is generated
 3. Groq analyzes the email and returns structured JSON: category, urgency, sentiment, and a summary
 4. The AI response is validated before parsing — malformed or out-of-vocabulary values are caught and safely defaulted rather than crashing the run
@@ -18,6 +18,15 @@ Built as a portfolio project to demonstrate workflow automation, AI integration,
 8. **Rejected** → the team is notified in Slack to edit and send manually, and the ticket is still logged for tracking
 9. Any node failure anywhere in the pipeline (including exhausted Groq 429 retries) is caught by a separate Error Handler workflow, which logs it to an Error Log sheet and pages the team in Slack
 
+![](Docs/1.png)
+![](Docs/1.1.png)
+![](Docs/2.png)
+![](Docs/3.png)
+![](Docs/4.png)
+![](Docs/5.png)
+![](Docs/6.png)
+![](Docs/7.png)
+![](Docs/8.png)
 ## Tech stack
 
 - **n8n** (self-hosted or n8n Cloud) — workflow orchestration
