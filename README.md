@@ -4,7 +4,7 @@ An n8n automation that reads incoming support emails from Gmail, classifies them
 
 Built as a portfolio project to demonstrate workflow automation, AI integration, multi-service API orchestration, and production-minded error handling — not just a "trigger calls API" demo.
 
-![Architecture diagram](docs/diagram.png)
+![Architecture diagram](Docs/Diagram.png)
 
 ## How it works
 
