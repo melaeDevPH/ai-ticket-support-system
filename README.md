@@ -4,7 +4,7 @@ An n8n automation that reads incoming support emails from Gmail, classifies them
 
 Built as a portfolio project to demonstrate workflow automation, AI integration, multi-service API orchestration, and production-minded error handling — not just a "trigger calls API" demo.
 
-![Architecture diagram](docs/architecture-diagram.png)
+![Architecture diagram](docs/diagram.png)
 
 ## How it works
 
@@ -104,10 +104,3 @@ A few real issues worth mentioning since they came up during actual development,
 - **Cross-node data references** — once an item passes through a node like Slack, `$json` refers to that node's output, not the original ticket data; fixed with explicit `$('Node Name').item.json.field` references
 - **Slack's approval buttons require explicit configuration** — the "Send and Wait" node doesn't show a Reject button until you add it under Approval Options
 
-## License
-
-MIT
-
----
-
-Built by [Amelita Dela Torre](https://github.com/aemie-dev)
