@@ -1,0 +1,1057 @@
+{
+  "name": "AI Customer Support Ticket System",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "01e6b9b8-8d97-4339-b69d-0f998e196549",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        96,
+        -32
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f1",
+              "name": "errorId",
+              "type": "string",
+              "value": "={{ 'ERR-' + $now.format('yyyyMMdd-HHmmss') }}"
+            },
+            {
+              "id": "f2",
+              "name": "failedWorkflow",
+              "type": "string",
+              "value": "={{ $json.workflow.name }}"
+            },
+            {
+              "id": "f3",
+              "name": "failedNode",
+              "type": "string",
+              "value": "={{ $json.execution.lastNodeExecuted }}"
+            },
+            {
+              "id": "f4",
+              "name": "errorMessage",
+              "type": "string",
+              "value": "={{ $json.execution.error.message || 'Unknown error' }}"
+            },
+            {
+              "id": "f5",
+              "name": "isRateLimit",
+              "type": "boolean",
+              "value": "={{ ($json.execution.error.message || '').includes('429') || ($json.execution.error.message || '').toLowerCase().includes('rate limit') }}"
+            },
+            {
+              "id": "f6",
+              "name": "timestamp",
+              "type": "string",
+              "value": "={{ $now.toISO() }}"
+            },
+            {
+              "id": "f7",
+              "name": "executionUrl",
+              "type": "string",
+              "value": "={{ $json.execution.url }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5f8b5267-2c44-47ab-8ebd-f2e365560cc1",
+      "name": "Format Error Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        320,
+        -32
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1odIlNswn7Zy2HzIW4G7HutaKi8mNJVf37ATQS-ZyOA4",
+          "mode": "list",
+          "cachedResultName": "ticket-tracking spreadsheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1odIlNswn7Zy2HzIW4G7HutaKi8mNJVf37ATQS-ZyOA4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1015139114,
+          "mode": "list",
+          "cachedResultName": "Error Log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1odIlNswn7Zy2HzIW4G7HutaKi8mNJVf37ATQS-ZyOA4/edit#gid=1015139114"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "errorId": "={{ $json.errorId }}",
+            "failedWorkflow": "={{ $json.failedWorkflow }}",
+            "failedNode": "={{ $json.failedNode }}",
+            "errorMessage": "={{ $json.errorMessage }}",
+            "isRateLimit": "={{ $json.isRateLimit }}",
+            "timestamp": "={{ $json.timestamp }}",
+            "executionUrl": "={{ $json.executionUrl }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "errorId",
+              "displayName": "errorId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "failedWorkflow",
+              "displayName": "failedWorkflow",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "failedNode",
+              "displayName": "failedNode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "errorMessage",
+              "displayName": "errorMessage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "isRateLimit",
+              "displayName": "isRateLimit",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "executionUrl",
+              "displayName": "executionUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "4d588a84-424c-46f0-9ac7-c3f8c3e4fe75",
+      "name": "Sheets - Log Error",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        544,
+        -32
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "bhLMiI2PnXZqpe1Q",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0BFBAESSG4",
+          "mode": "list",
+          "cachedResultName": "support-alerts"
+        },
+        "text": "=:rotating_light: *Workflow failure detected*\n\n*Error ID:* {{ $json.errorId }}\n*Workflow:* {{ $json.failedWorkflow }}\n*Failed node:* {{ $json.failedNode }}\n*Rate limited (429):* {{ $json.isRateLimit ? 'Yes - Groq API throttled, retries were exhausted' : 'No' }}\n*Message:* {{ $json.errorMessage }}\n\n<{{ $json.executionUrl }}|View execution>",
+        "otherOptions": {}
+      },
+      "id": "f72f5b84-48aa-4d34-b99a-e679ced50a47",
+      "name": "Slack - Alert Team",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        768,
+        -32
+      ],
+      "webhookId": "67db76c4-2bf4-4ab1-b4f6-58d29d63bd35",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "3F4WxsGGoqsha68V",
+          "name": "Slack OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {
+          "labelIds": [
+            "INBOX"
+          ],
+          "readStatus": "unread"
+        }
+      },
+      "id": "770c3c34-8595-4a7d-a483-a49dfb60b8e5",
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1232,
+        -32
+      ],
+      "alwaysOutputData": false,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OSW6drC2gLodAthG",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e1",
+              "name": "ticketId",
+              "type": "string",
+              "value": "={{ 'TCK-' + $now.format('yyyyMMdd-HHmmss') + '-' + Math.floor(Math.random()*900+100) }}"
+            },
+            {
+              "id": "e2",
+              "name": "senderName",
+              "type": "string",
+              "value": "={{ $json.From.split('<')[0].trim().replace(/\"/g,'') }}"
+            },
+            {
+              "id": "e3",
+              "name": "senderEmail",
+              "type": "string",
+              "value": "={{ ($json.From.match(/<(.+)>/) ? $json.From.match(/<(.+)>/)[1] : $json.From).trim() }}"
+            },
+            {
+              "id": "e4",
+              "name": "subject",
+              "type": "string",
+              "value": "={{ $json.Subject }}"
+            },
+            {
+              "id": "e5",
+              "name": "body",
+              "type": "string",
+              "value": "={{ $json.text || $json.textAsHtml || '' }}"
+            },
+            {
+              "id": "e6",
+              "name": "receivedAt",
+              "type": "string",
+              "value": "={{ $json.date || $now.toISO() }}"
+            },
+            {
+              "id": "e7",
+              "name": "gmailMessageId",
+              "type": "string",
+              "value": "={{ $json.id }}"
+            },
+            {
+              "id": "e8",
+              "name": "gmailThreadId",
+              "type": "string",
+              "value": "={{ $json.threadId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c724c592-1a42-4637-9cca-3e196a06f42e",
+      "name": "Extract Email Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1008,
+        -32
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"llama-3.1-8b-instant\",\n  \"temperature\": 0.2,\n  \"max_tokens\": 300,\n  \"response_format\": { \"type\": \"json_object\" },\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are an AI assistant that classifies customer support emails for a SaaS company. Respond ONLY with a single valid JSON object. No markdown, no code fences, no explanation, no text outside the JSON. The JSON must exactly match this schema: {\\\"summary\\\": string (max 2 sentences, plain text), \\\"category\\\": one of [\\\"Bug\\\", \\\"Feature Request\\\", \\\"Billing\\\", \\\"General Inquiry\\\"], \\\"urgency\\\": one of [\\\"Low\\\", \\\"Medium\\\", \\\"High\\\"], \\\"sentiment\\\": one of [\\\"Positive\\\", \\\"Neutral\\\", \\\"Negative\\\"]}. If unsure, choose the closest matching category and default urgency to Medium.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Sender: {{ $json.senderName }} <{{ $json.senderEmail }}>\\nSubject: {{ $json.subjectSafe }}\\nBody:\\n{{ $json.bodySafe }}\\n\\nAnalyze this email and return the JSON classification only.\"\n    }\n  ]\n}",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "4bdebe93-0af8-467e-b7b8-e5420a8c3730",
+      "name": "Groq - Classify Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -800,
+        -32
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "vmy8xuHrDMCTUg4f",
+          "name": "Header Auth account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Validate and parse the Groq classification response.\n// Throws a descriptive error on malformed JSON so the Error Trigger workflow can catch it.\nconst allowedCategory = ['Bug', 'Feature Request', 'Billing', 'General Inquiry'];\nconst allowedUrgency = ['Low', 'Medium', 'High'];\nconst allowedSentiment = ['Positive', 'Neutral', 'Negative'];\n\nconst input = $input.first().json;\nconst rawContent = input?.choices?.[0]?.message?.content;\n\nif (!rawContent) {\n  throw new Error('Groq classification response missing message content. Raw response: ' + JSON.stringify(input).slice(0, 500));\n}\n\nlet parsed;\ntry {\n  // Strip accidental code fences just in case the model adds them\n  const cleaned = rawContent.trim().replace(/^```json/i, '').replace(/^```/, '').replace(/```$/, '').trim();\n  parsed = JSON.parse(cleaned);\n} catch (err) {\n  throw new Error('Groq classification did not return valid JSON: ' + rawContent.slice(0, 300));\n}\n\nif (!allowedCategory.includes(parsed.category)) parsed.category = 'General Inquiry';\nif (!allowedUrgency.includes(parsed.urgency)) parsed.urgency = 'Medium';\nif (!allowedSentiment.includes(parsed.sentiment)) parsed.sentiment = 'Neutral';\nif (typeof parsed.summary !== 'string' || !parsed.summary.trim()) parsed.summary = 'No summary generated.';\n\nreturn [{\n  json: {\n    ...$('Extract Email Data').first().json,\n    summary: parsed.summary,\n    category: parsed.category,\n    urgency: parsed.urgency,\n    sentiment: parsed.sentiment\n  }\n}];"
+      },
+      "id": "a612f844-4c9a-4419-a759-02c82dc39031",
+      "name": "Validate & Parse Classification",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -576,
+        -32
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"llama-3.1-8b-instant\",\n  \"temperature\": 0.5,\n  \"max_tokens\": 350,\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a professional, empathetic customer support agent. Write email replies that are warm, concise, and under 150 words. Do not promise specific fixes, timelines, or new features. When appropriate, mention general next steps such as 'our team is reviewing this'. Return ONLY the plain-text email body, no subject line, no markdown, ending with 'Best regards, Support Team'.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Customer name: {{ $json.senderName }}\\nSubject: {{ $json.subjectSafe }}\\nOriginal message:\\n{{ $json.bodySafe }}\\n\\nClassification -> category: {{ $json.category }}, urgency: {{ $json.urgency }}, sentiment: {{ $json.sentiment }}\\nSummary: {{ $json.summary }}\\n\\nWrite a professional reply email body.\"\n    }\n  ]\n}",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "a9fc5002-3137-4920-99ea-bf37c240e17b",
+      "name": "Groq - Generate Draft Reply",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -352,
+        -32
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "vmy8xuHrDMCTUg4f",
+          "name": "Header Auth account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst draft = input?.choices?.[0]?.message?.content;\nif (!draft || !draft.trim()) {\n  throw new Error('Groq draft-reply response missing message content. Raw response: ' + JSON.stringify(input).slice(0, 500));\n}\nreturn [{\n  json: {\n    ...$('Validate & Parse Classification').first().json,\n    draftResponse: draft.trim()\n  }\n}];"
+      },
+      "id": "f727737f-99f7-4035-9e2d-dea3324a04e9",
+      "name": "Extract Draft Text",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -128,
+        -32
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "sendAndWait",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0BFBAESSG4",
+          "mode": "list",
+          "cachedResultName": "support-alerts"
+        },
+        "message": "=*New support ticket needs approval* :envelope_with_arrow:\n\n*Ticket:* {{ $json.ticketId }}\n*Customer:* {{ $json.senderName }} ({{ $json.senderEmail }})\n*Subject:* {{ $json.subject }}\n*Category:* {{ $json.category }}   *Urgency:* {{ $json.urgency }}   *Sentiment:* {{ $json.sentiment }}\n\n*AI Summary:*\n{{ $json.summary }}\n\n*Draft Response:*\n{{ $json.draftResponse }}",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double"
+          }
+        },
+        "options": {}
+      },
+      "id": "ea6db93d-1967-4370-9147-28e9c5c1c8d2",
+      "name": "Slack - Send for Approval",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        96,
+        -32
+      ],
+      "webhookId": "slack-approval-webhook-0007",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "3F4WxsGGoqsha68V",
+          "name": "Slack OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "7a2bbbb4-cf4b-4569-899b-3e049c755c34",
+      "name": "Approved?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        320,
+        -32
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Extract Email Data').first().json.gmailMessageId }}",
+        "message": "={{ $('Extract Draft Text').first().json.draftResponse }}",
+        "options": {
+          "senderName": "Support Team"
+        }
+      },
+      "id": "b0fec7ba-3ab8-461c-8d39-8001c3a8dc1e",
+      "name": "Gmail - Send Reply",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        528,
+        -160
+      ],
+      "webhookId": "782771db-bef4-418e-9f6c-7b821a00b6ee",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OSW6drC2gLodAthG",
+          "name": "Gmail OAuth2 API"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1odIlNswn7Zy2HzIW4G7HutaKi8mNJVf37ATQS-ZyOA4",
+          "mode": "list",
+          "cachedResultName": "ticket-tracking spreadsheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1odIlNswn7Zy2HzIW4G7HutaKi8mNJVf37ATQS-ZyOA4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Tickets",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1odIlNswn7Zy2HzIW4G7HutaKi8mNJVf37ATQS-ZyOA4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Ticket ID": "={{ $('Extract Draft Text').item.json.ticketId }}",
+            "Date": "={{ $('Extract Draft Text').item.json.receivedAt }}",
+            "Customer Name": "={{ $('Extract Draft Text').item.json.senderName }}",
+            "Customer Email": "={{ $('Extract Draft Text').item.json.senderEmail }}",
+            "Subject": "={{ $('Extract Draft Text').item.json.subject }}",
+            "Category": "={{ $('Extract Draft Text').item.json.category }}",
+            "Sentiment": "={{ $('Extract Draft Text').item.json.sentiment }}",
+            "Urgency": "={{ $('Extract Draft Text').item.json.urgency }}",
+            "AI Summary": "={{ $('Extract Draft Text').item.json.summary }}",
+            "Draft Response": "={{ $('Extract Draft Text').item.json.draftResponse }}",
+            "Response Status": "=Approved - Sent",
+            "Final Response": "={{ $('Extract Draft Text').item.json.draftResponse }}",
+            "Resolution Date": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Ticket ID",
+              "displayName": "Ticket ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Customer Name",
+              "displayName": "Customer Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Customer Email",
+              "displayName": "Customer Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Subject",
+              "displayName": "Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Sentiment",
+              "displayName": "Sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Urgency",
+              "displayName": "Urgency",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "AI Summary",
+              "displayName": "AI Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Draft Response",
+              "displayName": "Draft Response",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Response Status",
+              "displayName": "Response Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final Response",
+              "displayName": "Final Response",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Resolution Date",
+              "displayName": "Resolution Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "fbed2ab9-a502-42dd-9a5b-067f433625d5",
+      "name": "Sheets - Log Approved Ticket",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        752,
+        -160
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "bhLMiI2PnXZqpe1Q",
+          "name": "Google Sheets OAuth2 API"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0BFBAESSG4",
+          "mode": "list",
+          "cachedResultName": "support-alerts"
+        },
+        "text": "=:x: *Ticket {{ $('Extract Draft Text').first().json.ticketId }} was rejected*\n\n*Customer:* {{ $('Extract Draft Text').first().json.senderName }} ({{ $('Extract Draft Text').first().json.senderEmail }})\n*Subject:* {{ $('Extract Draft Text').first().json.subject }}\n\nThe AI draft was not approved. Please edit the response manually and send it, then update the ticket status in the sheet.",
+        "otherOptions": {}
+      },
+      "id": "214bf316-4984-481e-ba20-d5876c95f037",
+      "name": "Slack - Notify Rejection",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        528,
+        128
+      ],
+      "webhookId": "a8e3c1db-383a-4707-8ac6-31cb835877a2",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "3F4WxsGGoqsha68V",
+          "name": "Slack OAuth2 API"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1odIlNswn7Zy2HzIW4G7HutaKi8mNJVf37ATQS-ZyOA4",
+          "mode": "list",
+          "cachedResultName": "ticket-tracking spreadsheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1odIlNswn7Zy2HzIW4G7HutaKi8mNJVf37ATQS-ZyOA4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Tickets",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1odIlNswn7Zy2HzIW4G7HutaKi8mNJVf37ATQS-ZyOA4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Ticket ID": "={{ $('Extract Draft Text').item.json.ticketId }}",
+            "Date": "={{ $('Extract Draft Text').item.json.receivedAt }}",
+            "Customer Name": "={{ $('Extract Draft Text').item.json.senderName }}",
+            "Customer Email": "={{ $('Extract Draft Text').item.json.senderEmail }}",
+            "Subject": "={{ $('Extract Draft Text').item.json.subject }}",
+            "Category": "={{ $('Extract Draft Text').item.json.category }}",
+            "Sentiment": "={{ $('Extract Draft Text').item.json.sentiment }}",
+            "Urgency": "={{ $('Extract Draft Text').item.json.urgency }}",
+            "AI Summary": "={{ $('Extract Draft Text').item.json.summary }}",
+            "Draft Response": "={{ $('Extract Draft Text').item.json.draftResponse }}",
+            "Response Status": "Rejected - Needs Manual Edit"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Ticket ID",
+              "displayName": "Ticket ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Customer Name",
+              "displayName": "Customer Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Customer Email",
+              "displayName": "Customer Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Subject",
+              "displayName": "Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Sentiment",
+              "displayName": "Sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Urgency",
+              "displayName": "Urgency",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "AI Summary",
+              "displayName": "AI Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Draft Response",
+              "displayName": "Draft Response",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Response Status",
+              "displayName": "Response Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Final Response",
+              "displayName": "Final Response",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Resolution Date",
+              "displayName": "Resolution Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "39037373-744f-48b0-a52e-df6c48e21eab",
+      "name": "Sheets - Log Rejected Ticket",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        752,
+        128
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "bhLMiI2PnXZqpe1Q",
+          "name": "Google Sheets OAuth2 API"
+        }
+      },
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Format Error Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Error Data": {
+      "main": [
+        [
+          {
+            "node": "Sheets - Log Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheets - Log Error": {
+      "main": [
+        [
+          {
+            "node": "Slack - Alert Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Extract Email Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Email Data": {
+      "main": [
+        [
+          {
+            "node": "Groq - Classify Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq - Classify Email": {
+      "main": [
+        [
+          {
+            "node": "Validate & Parse Classification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate & Parse Classification": {
+      "main": [
+        [
+          {
+            "node": "Groq - Generate Draft Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq - Generate Draft Reply": {
+      "main": [
+        [
+          {
+            "node": "Extract Draft Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Draft Text": {
+      "main": [
+        [
+          {
+            "node": "Slack - Send for Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack - Send for Approval": {
+      "main": [
+        [
+          {
+            "node": "Approved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approved?": {
+      "main": [
+        [
+          {
+            "node": "Gmail - Send Reply",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Slack - Notify Rejection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail - Send Reply": {
+      "main": [
+        [
+          {
+            "node": "Sheets - Log Approved Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack - Notify Rejection": {
+      "main": [
+        [
+          {
+            "node": "Sheets - Log Rejected Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "5174cdd7-5d61-4881-9e78-eea433a4e0f6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "02c68019032b7626fb489d25e3c7cdc1b55ec0c5cb15fa765ae7448bf3257efe"
+  },
+  "nodeGroups": [],
+  "id": "HdBSQb2pWqxhGCcl",
+  "tags": []
+}

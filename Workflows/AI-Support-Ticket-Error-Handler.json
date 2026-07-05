@@ -1,0 +1,90 @@
+{
+  "name": "AI Support Ticket - Error Handler",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "2b2b2b2b-0001-4a4a-8a8a-000000000001",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [ -680, 0 ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "f1", "name": "errorId", "type": "string", "value": "={{ 'ERR-' + $now.format('yyyyMMdd-HHmmss') }}" },
+            { "id": "f2", "name": "failedWorkflow", "type": "string", "value": "={{ $json.workflow.name }}" },
+            { "id": "f3", "name": "failedNode", "type": "string", "value": "={{ $json.execution.lastNodeExecuted }}" },
+            { "id": "f4", "name": "errorMessage", "type": "string", "value": "={{ $json.execution.error.message || 'Unknown error' }}" },
+            { "id": "f5", "name": "isRateLimit", "type": "boolean", "value": "={{ ($json.execution.error.message || '').includes('429') || ($json.execution.error.message || '').toLowerCase().includes('rate limit') }}" },
+            { "id": "f6", "name": "timestamp", "type": "string", "value": "={{ $now.toISO() }}" },
+            { "id": "f7", "name": "executionUrl", "type": "string", "value": "={{ $json.execution.url }}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2b2b2b2b-0002-4a4a-8a8a-000000000002",
+      "name": "Format Error Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [ -460, 0 ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": { "mode": "id", "value": "GOOGLE_SHEET_ID" },
+        "sheetName": { "mode": "name", "value": "Error Log" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Error ID": "={{ $json.errorId }}",
+            "Timestamp": "={{ $json.timestamp }}",
+            "Workflow": "={{ $json.failedWorkflow }}",
+            "Failed Node": "={{ $json.failedNode }}",
+            "Error Message": "={{ $json.errorMessage }}",
+            "Is Rate Limit": "={{ $json.isRateLimit }}",
+            "Execution URL": "={{ $json.executionUrl }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "2b2b2b2b-0003-4a4a-8a8a-000000000003",
+      "name": "Sheets - Log Error",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [ -240, 0 ],
+      "credentials": {
+        "googleSheetsOAuth2Api": { "id": "GSHEETS_CRED_ID", "name": "Google Sheets (support tickets)" }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "post",
+        "select": "channel",
+        "channelId": { "mode": "name", "value": "support-alerts" },
+        "text": "=:rotating_light: *Workflow failure detected*\n\n*Error ID:* {{ $json.errorId }}\n*Workflow:* {{ $json.failedWorkflow }}\n*Failed node:* {{ $json.failedNode }}\n*Rate limited (429):* {{ $json.isRateLimit ? 'Yes - Groq API throttled, retries were exhausted' : 'No' }}\n*Message:* {{ $json.errorMessage }}\n\n<{{ $json.executionUrl }}|View execution>",
+        "options": {}
+      },
+      "id": "2b2b2b2b-0004-4a4a-8a8a-000000000004",
+      "name": "Slack - Alert Team",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [ -20, 0 ],
+      "credentials": {
+        "slackApi": { "id": "SLACK_CRED_ID", "name": "Slack Bot (support-alerts)" }
+      }
+    }
+  ],
+  "connections": {
+    "Error Trigger": { "main": [ [ { "node": "Format Error Data", "type": "main", "index": 0 } ] ] },
+    "Format Error Data": { "main": [ [ { "node": "Sheets - Log Error", "type": "main", "index": 0 } ] ] },
+    "Sheets - Log Error": { "main": [ [ { "node": "Slack - Alert Team", "type": "main", "index": 0 } ] ] }
+  },
+  "active": true,
+  "settings": { "executionOrder": "v1" },
+  "pinData": {},
+  "versionId": "1",
+  "meta": { "templateCredsSetupCompleted": false }
+}
